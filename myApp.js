@@ -1,21 +1,38 @@
-// Import the Express.js framework
-let express = require('express');
+let express = require('express'); // Import the Express.js framework
+let app = express(); // Create an instance of the Express application
+let bodyParser = require('bodyParser'); // Import bodyParser
+require('dotenv').config() // Import dotenv
 
-// Create an instance of the Express application
-let app = express();
-
-// Load dotenv
-require('dotenv').config()
-
-// Define a middleware function that logs the HTTP method, request path, and client IP address to the console
+// Define middleware to log HTTP method, req path, and client IP address to console
 const middlewareLogger = (req, res, next) => {
   console.log(req.method + " " + req.path + " - " + req.ip);
-  // Call the next function in the middleware chain to pass control to the next middleware or route handler
+  // Call "next" function in middleware chain to pass control to next middleware/route handler
   next();
 }
 
-// Mount the middlewareLogger on the entire application
-app.use(middlewareLogger);
+app.use(middlewareLogger); // Mount middlewareLogger on the entire application
+
+// Middleware to set current time in request object and respond with a JSON containing the time
+app.get('/now', 
+  (req, res, next) => {
+    req.time = new Date().toString(); // Set current time
+    next(); // Pass control to the next middleware
+  }, 
+  (req, res) => {
+    res.json({time: req.time}); // Respond with JSON containing the time
+  }
+);
+
+// Echo server
+app.get('/:word/echo', (req, res) => {
+  res.json({echo: req.params.word});
+})
+
+// API endpoint
+app.get('/name', (req, res) => {
+  const {first, last} = req.query;
+  res.json({name: `${first} ${last}`});
+})
 
 // Display index.html at the root path
 app.get("/", (req, res) => {
