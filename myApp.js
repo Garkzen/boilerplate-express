@@ -1,6 +1,6 @@
 let express = require('express'); // Import the Express.js framework
 let app = express(); // Create an instance of the Express application
-let bodyParser = require('bodyParser'); // Import bodyParser
+let bodyParser = require('body-parser'); // Import bodyParser
 require('dotenv').config() // Import dotenv
 
 // Define middleware to log HTTP method, req path, and client IP address to console
@@ -11,6 +11,7 @@ const middlewareLogger = (req, res, next) => {
 }
 
 app.use(middlewareLogger); // Mount middlewareLogger on the entire application
+app.use(bodyParser.urlencoded({extended: false})); // Mount bodyParser
 
 // Middleware to set current time in request object and respond with a JSON containing the time
 app.get('/now', 
@@ -28,14 +29,17 @@ app.get('/:word/echo', (req, res) => {
   res.json({echo: req.params.word});
 })
 
-// API endpoint
+// GET Route for retrieving name from query parameters
 app.get('/name', (req, res) => {
   const {first, last} = req.query;
   res.json({name: `${first} ${last}`});
 })
 
-// Mount bodyParser
-app.use(bodyParser.urlencoded({extended: false}));
+// POST Route for retrieving name from request body
+app.post('/name', (req, res) => {
+  const {first, last} = req.body;
+  res.json({name: `${first} ${last}`});
+})
 
 // Display index.html at the root path
 app.get("/", (req, res) => {
@@ -53,7 +57,6 @@ app.get("/json", (req, res) => {
 
 // Serve the files in the /public directory statically at the /public path
 app.use("/public", express.static(__dirname + '/public'));
-
 
 console.log("Hello World");  
 
