@@ -34,6 +34,9 @@ app.get('/name', (req, res) => {
   res.json({name: `${first} ${last}`});
 })
 
+// Mount bodyParser
+app.use(bodyParser.urlencoded({extended: false}));
+
 // Display index.html at the root path
 app.get("/", (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
